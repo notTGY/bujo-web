@@ -1,40 +1,135 @@
-import React, {useEffect, useState} from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
+
+import './Page.css'
+
+import { redrawCanvas, drawPath } from '../../utils/utils'
+
 
 function Page(props) {
-  const cellDPI = props.cellSize?props.cellSize*2:20
+  const cellDPI = props.cellSize ? props.cellSize * 2 : 20
+  const data = props.data ? props.data : {paths: [], texts: [], templateLeft: 'blank', templateRight: 'black'}
+
+  const [canvas, setCanvas] = useState(null)
+  const [stylus, setStylus] = useState(null)
+  const [painting, setPainting] = useState(false)
+  const [currentPath, setCurrentPath] = useState([])
+  
+  const [isStylusShown, setIsStylusShown] = useState(false)
 
 
-  const [cid, setCid] = useState('')
-  const [c, setC] = useState({})
+  const cRef = useCallback(c => {
+    if (c === null) return
 
-  useEffect(_ => {
-    const val = 'canvas' + Math.floor(255*Math.random()).toString(16)
-    setCid(val)
-  }, [])
-
-  useEffect(_ => {
-    if (!cid) return
-    setC(document.getElementById(cid))
-  }, [cid])
-
-  useEffect(_ => {
-    if (!('id' in c)) return
+    setCanvas(c)
 
     c.style.width = (28*cellDPI / 2) + 'px'
     c.style.height = (41*cellDPI / 2) + 'px'
     c.width = 28*cellDPI
     c.height = 41*cellDPI
-
     const ctx = c.getContext('2d')
-    ctx.fillStyle = '#edbfb7'
-    ctx.fillRect(0,0,c.width,c.height)
-  }, [c])
+    
+    redrawCanvas(c, ctx, data, props.pageIndex)
+  }, [cellDPI])
+
+  useEffect(_ => {
+    if (canvas === null) return
+
+    const ctx = canvas.getContext('2d')
+    
+    redrawCanvas(canvas, ctx, data, props.pageIndex)
+  }, [props.redraw])
+
+  const sRef = useCallback(s => setStylus(s), [])
 
 
+  function mouseMoveHandler(e) {
+    requestAnimationFrame(_ => {
+      if (stylus === null) return
+
+      // place for line painting
+
+      if (props.mode !== 'pen') return
+
+      setIsStylusShown(true)
+      stylus.style.top = Math.floor(e.clientY-4) + 'px'
+      stylus.style.left = Math.floor(e.clientX-4) + 'px'
+      if (painting) {
+        const relX = (e.clientX - canvas.offsetLeft) / cellDPI
+        const relY = (e.clientY - canvas.offsetTop) / cellDPI
+
+        setCurrentPath(e => [...e, {x: relX, y: relY}])
+        const ctx = canvas.getContext('2d')
+        drawPath(canvas, ctx, currentPath, props.pageIndex)
+
+      }
+
+    })
+  }
+
+  function mouseDownHandler(e) {
+    if (props.mode === 'pen') {
+      if (!painting) {
+        setPainting(true)
+
+        const relX = (e.clientX - canvas.offsetLeft) / cellDPI
+        const relY = (e.clientY - canvas.offsetTop) / cellDPI
+
+        setCurrentPath([{type: 'pen', pageIndex: props.pageIndex}, {x: relX, y: relY}])
+        const ctx = canvas.getContext('2d')
+        drawPath(canvas, ctx, [{type: 'pen', pageIndex: props.pageIndex}, {x: relX, y: relY}], props.pageIndex)
+      }
+    } else if (props.mode === 'line') {
+      
+    }
+  }
+
+  function mouseUpHandler(e) {
+    if (props.mode === 'pen') {
+      if (painting) {
+        setPainting(false)
+
+        props.setData(e => {
+          let res = e
+          res.paths.push(currentPath)
+          return res
+        })
+
+        setCurrentPath([])
+        const ctx = canvas.getContext('2d')
+        redrawCanvas(canvas, ctx, data, props.pageIndex)
+      }
+    } else if (props.mode === 'line') {
+      
+    }
+  }
+
+  function mouseLeaveHandler(e) {
+    if(stylus === null) return
+    setPainting(false)
+    setIsStylusShown(false)
+  }
 
   return (
-    <div className='text-ink'>
-      <canvas id={cid}/>
+    <div 
+      className="text-ink shadow-2xl"
+      onMouseLeave={mouseLeaveHandler}
+      onMouseMove={mouseMoveHandler}
+      onMouseDown={mouseDownHandler}
+      onMouseUp={mouseUpHandler}
+    >
+      <canvas 
+        ref={cRef}
+        id="c"
+      />
+      <svg 
+        viewBox="-8 -8 16 16" 
+        fill="currentcolor" 
+        style={{display: isStylusShown?'block':'none'}}
+        className="stylus" 
+        ref={sRef}
+      >
+        <circle x="8" y="8" r="4"></circle>
+      </svg>
     </div>
   )
 }
