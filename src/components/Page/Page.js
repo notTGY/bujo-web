@@ -13,6 +13,7 @@ function Page(props) {
   const [stylus, setStylus] = useState(null)
   const [painting, setPainting] = useState(false)
   const [currentPath, setCurrentPath] = useState([])
+  const [screenshot, setScreenshot] = useState(null)
   
   const [isStylusShown, setIsStylusShown] = useState(false)
 
@@ -46,13 +47,20 @@ function Page(props) {
     requestAnimationFrame(_ => {
       if (stylus === null) return
 
-      // place for line painting
+      if (painting && props.mode === 'line') {
+        const relX = (e.clientX - canvas.offsetLeft) / cellDPI
+        const relY = (e.clientY - canvas.offsetTop) / cellDPI
+
+        const ctx = canvas.getContext('2d')
+        ctx.putImageData(screenshot, 0, 0)
+        drawPath(canvas, ctx, [...currentPath, {x: relX, y: relY}], props.pageIndex)
+      }
 
       if (props.mode !== 'pen') return
 
       setIsStylusShown(true)
-      stylus.style.top = Math.floor(e.clientY-4) + 'px'
-      stylus.style.left = Math.floor(e.clientX-4) + 'px'
+      stylus.style.top = Math.floor(e.clientY-2) + 'px'
+      stylus.style.left = Math.floor(e.clientX-2) + 'px'
       if (painting) {
         const relX = (e.clientX - canvas.offsetLeft) / cellDPI
         const relY = (e.clientY - canvas.offsetTop) / cellDPI
@@ -79,7 +87,6 @@ function Page(props) {
         drawPath(canvas, ctx, [{type: 'pen', pageIndex: props.pageIndex}, {x: relX, y: relY}], props.pageIndex)
       }
     } else if (props.mode === 'line') {
-      
     }
   }
 
@@ -99,14 +106,45 @@ function Page(props) {
         redrawCanvas(canvas, ctx, data, props.pageIndex)
       }
     } else if (props.mode === 'line') {
-      
+      if (!painting) {
+        setPainting(true)
+        const ctx = canvas.getContext('2d')
+        setScreenshot(ctx.getImageData(0, 0, canvas.width, canvas.height))
+        
+        const relX = (e.clientX - canvas.offsetLeft) / cellDPI
+        const relY = (e.clientY - canvas.offsetTop) / cellDPI
+
+        setCurrentPath([{type: 'line', pageIndex: props.pageIndex}, {x: relX, y: relY}])
+        drawPath(canvas, ctx, [{type: 'line', pageIndex: props.pageIndex}, {x: relX, y: relY}], props.pageIndex)
+      } else {
+        setPainting(false)
+
+        const relX = (e.clientX - canvas.offsetLeft) / cellDPI
+        const relY = (e.clientY - canvas.offsetTop) / cellDPI
+
+        props.setData(e => {
+          let res = e
+          res.paths.push([...currentPath, {x: relX, y: relY}])
+          return res
+        })
+
+        setCurrentPath([])
+        const ctx = canvas.getContext('2d')
+        redrawCanvas(canvas, ctx, data, props.pageIndex)
+      }
     }
   }
 
   function mouseLeaveHandler(e) {
-    if(stylus === null) return
     setPainting(false)
     setIsStylusShown(false)
+    props.setData(e => { 
+      let res = e
+      res.paths.push(currentPath)
+      return res
+    })
+
+    setCurrentPath([])
   }
 
   return (

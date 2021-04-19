@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 
 import Page from './components/Page/Page'
 import Sidebar from './components/Sidebar/Sidebar'
+import TextLayer from './components/TextLayer/TextLayer'
 
 function App() {
   const root = document.getElementById('root')
@@ -56,6 +57,7 @@ function App() {
         <Sidebar mode={mode} modeSetter={setMode} undoing={undoLastPath}/>
       </div>
 
+      <TextLayer data={data} />
     </div>
   )
 }

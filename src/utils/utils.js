@@ -11,20 +11,18 @@ function redrawCanvas(c, ctx, data, pageIndex) {
   const size = c.width / 28
   for (let i = 0; i < 27; i++) {
     for (let j = 0; j < 40; j++) {
-        ctx.fillRect(size*(1+i)-1, size*(1+j)-1, 2, 2)
+        ctx.fillRect(size*(1+i)-1, size*(1+j)-1, 3, 3)
     }
   }
 
 
-
-  if ('paths' in data) {
-    data.paths.forEach(path => drawPath(c, ctx, path, pageIndex))
-  }
-
+  if ('paths' in data) data.paths.forEach(path => drawPath(c, ctx, path, pageIndex))
 }
 
 
 function drawPath(c, ctx, path, pageIndex) {
+  if (!path) return
+  if (!path.length) return
   if (pageIndex !== path[0].pageIndex) return
   const bgColor = '#edbfb7'
   const dotsColor = '#c7e8f3'
