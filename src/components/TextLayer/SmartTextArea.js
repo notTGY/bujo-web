@@ -2,11 +2,12 @@ import React, { useState } from 'react'
 
 function SmartTextArea(props) {
   const [isDown, setIsDown] = useState(false)
+  console.log(props.textData)
   
+
   function onMM(e) {
     if (!isDown) return
-    e.target.style.left = ((e.clientX-20) | 0) + 'px'
-    e.target.style.top = ((e.clientY-20) | 0) + 'px'
+    props.changer(props.index, props.textData.text, ((e.clientY-20) | 0), ((e.clientX-20) | 0)) 
   }
 
   function onMU(e) {
@@ -16,18 +17,21 @@ function SmartTextArea(props) {
   function onMD(e) {
     setIsDown(true)
   }
-
+  
+  function changeHandler(e) {
+    props.changer(props.index, e.target.value, props.textData.top, props.textData.left)
+  }
 
   return (
     <textarea 
       onMouseMove={onMM}
       onMouseUp={onMU}
       onMouseDown={onMD}
-      className="fixed top-5 left-5 bg-transparent resize"
-      style={{draggable: true}}
-      draggable="true"
-    >
-    </textarea>
+      className="fixed bg-transparent resize"
+      value={props.textData.text}
+      style={{top: props.textData.top+'px', left: props.textData.left+'px'}}
+      onChange={changeHandler}
+    />
   )
 }
 

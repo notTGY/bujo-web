@@ -1,7 +1,6 @@
 function redrawCanvas(c, ctx, data, pageIndex) {
   const bgColor = '#edbfb7'
   const dotsColor = '#c7e8f3'
-  const inkColor = '#2f2235'
 
   ctx.fillStyle = bgColor
   ctx.fillRect(0, 0, c.width, c.height)
@@ -24,8 +23,6 @@ function drawPath(c, ctx, path, pageIndex) {
   if (!path) return
   if (!path.length) return
   if (pageIndex !== path[0].pageIndex) return
-  const bgColor = '#edbfb7'
-  const dotsColor = '#c7e8f3'
   const inkColor = '#2f2235'
 
   const size = 2 * c.width / 28

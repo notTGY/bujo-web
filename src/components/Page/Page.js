@@ -7,7 +7,6 @@ import { redrawCanvas, drawPath } from '../../utils/utils'
 
 function Page(props) {
   const cellDPI = props.cellSize ? props.cellSize * 2 : 20
-  const data = props.data ? props.data : {paths: [], texts: [], templateLeft: 'blank', templateRight: 'black'}
 
   const [canvas, setCanvas] = useState(null)
   const [stylus, setStylus] = useState(null)
@@ -29,16 +28,16 @@ function Page(props) {
     c.height = 41*cellDPI
     const ctx = c.getContext('2d')
     
-    redrawCanvas(c, ctx, data, props.pageIndex)
-  }, [cellDPI])
+    redrawCanvas(c, ctx, props.data, props.pageIndex)
+  }, [cellDPI, props.data, props.pageIndex])
 
   useEffect(_ => {
     if (canvas === null) return
 
     const ctx = canvas.getContext('2d')
     
-    redrawCanvas(canvas, ctx, data, props.pageIndex)
-  }, [props.redraw])
+    redrawCanvas(canvas, ctx, props.data, props.pageIndex)
+  }, [props.redraw, canvas, props.data, props.pageIndex])
 
   const sRef = useCallback(s => setStylus(s), [])
 
@@ -103,7 +102,7 @@ function Page(props) {
 
         setCurrentPath([])
         const ctx = canvas.getContext('2d')
-        redrawCanvas(canvas, ctx, data, props.pageIndex)
+        redrawCanvas(canvas, ctx, props.data, props.pageIndex)
       }
     } else if (props.mode === 'line') {
       if (!painting) {
@@ -130,7 +129,7 @@ function Page(props) {
 
         setCurrentPath([])
         const ctx = canvas.getContext('2d')
-        redrawCanvas(canvas, ctx, data, props.pageIndex)
+        redrawCanvas(canvas, ctx, props.data, props.pageIndex)
       }
     }
   }
