@@ -19,8 +19,13 @@ function Sidebar(props) {
   }
 
   function textButtonCallback() {
-    if (props.mode === 'text') props.modeSetter('none')
-    else props.modeSetter('text')
+    props.modeSetter('none')
+    props.setData(e => {
+      let res = e
+      res.texts.push({top: 5, left: 5, text: 'text'})
+      return res
+    })
+    props.setRedrawTexts(e => !e)
   }
 
   function backButtonCallback() {

@@ -16,6 +16,7 @@ function Page(props) {
   
   const [isStylusShown, setIsStylusShown] = useState(false)
 
+  const {data, pageIndex, setCorner} = props
 
   const cRef = useCallback(c => {
     if (c === null) return
@@ -28,16 +29,25 @@ function Page(props) {
     c.height = 41*cellDPI
     const ctx = c.getContext('2d')
     
-    redrawCanvas(c, ctx, props.data, props.pageIndex)
-  }, [cellDPI, props.data, props.pageIndex])
+    redrawCanvas(c, ctx, data, pageIndex)
+  }, [cellDPI, data, pageIndex])
 
+
+  useEffect(_ => {
+    if (canvas === null) return
+    const coords = {
+      top: canvas.offsetTop - 3,
+      left: canvas.offsetLeft
+    }
+    setCorner(coords)
+  }, [setCorner, canvas])
   useEffect(_ => {
     if (canvas === null) return
 
     const ctx = canvas.getContext('2d')
     
-    redrawCanvas(canvas, ctx, props.data, props.pageIndex)
-  }, [props.redraw, canvas, props.data, props.pageIndex])
+    redrawCanvas(canvas, ctx, data, pageIndex)
+  }, [props.redraw, canvas, data, pageIndex])
 
   const sRef = useCallback(s => setStylus(s), [])
 

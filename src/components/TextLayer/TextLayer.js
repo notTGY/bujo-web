@@ -1,38 +1,60 @@
-import React, { useState, useEffect } from 'react'
-
-import SmartTextArea from './SmartTextArea'
-
+import React from 'react'
 
 function TextLayer(props) {
-  const [data, setData] = useState({texts: []})
-  const texts = data.texts
+        const {
+          item, 
+          i, 
+          data, 
+          setData, 
+          setRedrawTexts, 
+          setCurText, 
+          font,
+          size,
+          corner
+        } = props
 
-  useEffect(_ => {
-    setData(props.data)
-  }, [props.data])
+        const leftEffective = corner.left + item.left*size
+        const topEffective = corner.top + item.top*size
+        const minSize = size
 
+        function changeText(e) {
+          data.texts[i].text = e.target.value
+          setData(data)
+          setRedrawTexts(e => !e)
+        }
+        function abortHandler(e) {
+          if (data.texts[i].text !== '') return
+          data.texts.splice(i, 1)
+          setData(data)
+          setRedrawTexts(e => !e)
+        }
 
-  function translateCords(obj) {
-    const {text, top, left} = obj
-    return {
-      text,
-      top: props.relativeCords.top + props.size * top,
-      left: props.relativeCords.left + props.size * left
-    }
-  }
-  
-  return (
-    <div>
-      {texts.map((e, i) => 
-        <SmartTextArea 
-          key={i} 
-          index={i} 
-          textData={translateCords(e)} 
-          changer={props.changeText} 
+        function onMouseDown(e) {
+          if (e.clientX > leftEffective + minSize/2 || e.clientY > topEffective + minSize/2) return
+          setCurText(i)
+          setRedrawTexts(e => !e)
+        }
+
+        function onMouseUp(e) {
+          setCurText(-1)
+          setRedrawTexts(e => !e)
+        }
+
+        return <textarea 
+          className="fixed resize bg-transparent text-ink"
+          style={{
+            left: leftEffective+'px', 
+            top: topEffective+'px', 
+            minWidth: minSize + 'px', 
+            minHeight: minSize + 'px',
+            fontFamily: font
+          }}
+          onMouseUp={onMouseUp}
+          onMouseDown={onMouseDown}
+          value={item.text}
+          onBlur={abortHandler}
+          onChange={changeText} 
         />
-      )}
-    </div>
-  )
 }
 
 
