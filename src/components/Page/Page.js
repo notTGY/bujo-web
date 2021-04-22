@@ -16,7 +16,7 @@ function Page(props) {
   
   const [isStylusShown, setIsStylusShown] = useState(false)
 
-  const {data, pageIndex, setCorner} = props
+  const {data, pageIndex, setCorner, updateStorage, setData} = props
 
   const cRef = useCallback(c => {
     if (c === null) return
@@ -41,6 +41,7 @@ function Page(props) {
     }
     setCorner(coords)
   }, [setCorner, canvas])
+
   useEffect(_ => {
     if (canvas === null) return
 
@@ -104,11 +105,10 @@ function Page(props) {
       if (painting) {
         setPainting(false)
 
-        props.setData(e => {
-          let res = e
-          res.paths.push(currentPath)
-          return res
-        })
+        let res = data
+        res.paths.push(currentPath)
+        setData(res)
+        updateStorage(res)
 
         setCurrentPath([])
         const ctx = canvas.getContext('2d')
@@ -131,11 +131,10 @@ function Page(props) {
         const relX = (e.clientX - canvas.offsetLeft) / cellDPI
         const relY = (e.clientY - canvas.offsetTop) / cellDPI
 
-        props.setData(e => {
-          let res = e
-          res.paths.push([...currentPath, {x: relX, y: relY}])
-          return res
-        })
+        let res = data
+        res.paths.push([...currentPath, {x: relX, y: relY}])
+        setData(res)
+        updateStorage(res)
 
         setCurrentPath([])
         const ctx = canvas.getContext('2d')
@@ -147,11 +146,11 @@ function Page(props) {
   function mouseLeaveHandler(e) {
     setPainting(false)
     setIsStylusShown(false)
-    props.setData(e => { 
-      let res = e
-      res.paths.push(currentPath)
-      return res
-    })
+
+    let res = data
+    res.paths.push(currentPath)
+    setData(res)
+    updateStorage(res)
 
     setCurrentPath([])
   }

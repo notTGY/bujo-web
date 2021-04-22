@@ -10,7 +10,8 @@ function TextLayer(props) {
           setCurText, 
           font,
           size,
-          corner
+          corner,
+          updateStorage
         } = props
 
         const leftEffective = corner.left + item.left*size
@@ -20,12 +21,14 @@ function TextLayer(props) {
         function changeText(e) {
           data.texts[i].text = e.target.value
           setData(data)
+          updateStorage(data)
           setRedrawTexts(e => !e)
         }
         function abortHandler(e) {
           if (data.texts[i].text !== '') return
           data.texts.splice(i, 1)
           setData(data)
+          updateStorage(data)
           setRedrawTexts(e => !e)
         }
 

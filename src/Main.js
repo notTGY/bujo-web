@@ -46,6 +46,7 @@ function Main(props) {
       data.texts[curText].top = (event.y - corner.top)/size
       data.texts[curText].left = (event.x - corner.left)/size
       setData(data)
+      updateStorage(data)
       setRedrawTexts(e => !e)
     }
   }, [curText, root, corner, size, data])
@@ -55,20 +56,16 @@ function Main(props) {
   }, [root.offsetHeight])
 
   function undoLastPath() {
-    setData(e => {
-      let res = e
-      res.paths.pop()
-      return res
-    })
+    let res = data
+    res.paths.pop()
+    setData(res)
+    updateStorage(res)
     setRedraw(e => !e)
   }
 
-  useEffect(_ => {
-    const I = setInterval(_ => {
-      //savePage(props.page, data)
-    }, 2000)
-    return _ => clearInterval(I)
-  }, [props.page])
+  function updateStorage(data) {
+    savePage(props.page, data)
+  }
 
   useEffect(_ => {
     window.addEventListener('keyup', e => {
@@ -92,33 +89,59 @@ function Main(props) {
         <div className="pl-0.5 bg-book-shade">
           <div className="p-1 bg-book-cover flex flex-row">
             <div className="pl-0.5 bg-paper-shaded">
-              <Page redraw={redraw} cellSize={size} data={data} pageIndex={0} setData={setData} mode={mode} setCorner={setCorner} />
+              <Page 
+                redraw={redraw} 
+                cellSize={size} 
+                data={data} 
+                pageIndex={0} 
+                setData={setData} 
+                mode={mode} 
+                setCorner={setCorner} 
+                updateStorage={updateStorage} 
+              />
             </div>
 
             <div className="w-0.5" />
 
-            <Page redraw={redraw} cellSize={size} data={data} pageIndex={1} setData={setData} mode={mode} setCorner={e => e} />
+            <Page 
+              redraw={redraw} 
+              cellSize={size} 
+              data={data} 
+              pageIndex={1} 
+              setData={setData} 
+              mode={mode} 
+              setCorner={e => e} 
+              updateStorage={updateStorage} 
+            />
           </div>
         </div>
       </div>
 
       <div className="flex flex-row fixed top-0 left-0 items-center h-full">
-        <Sidebar mode={mode} modeSetter={setMode} setRedrawTexts={setRedrawTexts} undoing={undoLastPath} setData={setData}/>
+        <Sidebar 
+          mode={mode} 
+          modeSetter={setMode} 
+          setRedrawTexts={setRedrawTexts} 
+          undoing={undoLastPath}
+          setData={setData}
+        />
       </div>
       
       {data.texts.map((item, i) => 
-      <TextLayer 
-        font={font}
-        item={item} 
-        size={size}
-        key={i} 
-        i={i} 
-        data={data} 
-        setData={setData} 
-        setRedrawTexts={setRedrawTexts} 
-        setCurText={setCurText}
-        corner={corner}
-      /> )}
+        <TextLayer 
+          font={font}
+          item={item} 
+          size={size}
+          key={i} 
+          i={i} 
+          data={data} 
+          setData={setData} 
+          updateStorage={updateStorage}
+          setRedrawTexts={setRedrawTexts} 
+          setCurText={setCurText}
+          corner={corner}
+        /> 
+      )}
 
     </div>
   )
