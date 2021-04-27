@@ -11,7 +11,8 @@ function TextLayer(props) {
           font,
           size,
           corner,
-          updateStorage
+          updateStorage,
+          mode
         } = props
 
         const leftEffective = corner.left + item.left*size
@@ -33,6 +34,12 @@ function TextLayer(props) {
         }
 
         function onMouseDown(e) {
+          if (mode === 'eraser') {
+            data.texts.splice(i, 1)
+            setData(data)
+            updateStorage(data)
+            setRedrawTexts(e => !e)
+          }
           if (e.clientX > leftEffective + minSize/2 || e.clientY > topEffective + minSize/2) return
           setCurText(i)
           setRedrawTexts(e => !e)

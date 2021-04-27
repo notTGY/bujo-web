@@ -11,17 +11,12 @@ export default Main
 
 function Main(props) {
   const root = document.getElementById('root')
-  const fonts = [ 
-    "Comic Sans MS",
-    "'Courgette', cursive",
-    "'Pacifico', cursive",
-    "'Yellowtail', cursive"
-  ]
-  const font = fonts[0]
-  
+  const font = props.font
+  const setShowingBook = props.setShowingBook
 
   const [size, setSize] = useState(root.offsetHeight / 42)
   const [redraw, setRedraw] = useState(true)
+  // eslint-disable-next-line
   const [_, setRedrawTexts] = useState(true)
   const [corner, setCorner] = useState({left: 0, top: 0})
 
@@ -49,6 +44,7 @@ function Main(props) {
       updateStorage(data)
       setRedrawTexts(e => !e)
     }
+  // eslint-disable-next-line
   }, [curText, root, corner, size, data])
 
   useEffect(_ => {
@@ -77,6 +73,7 @@ function Main(props) {
         return false
       }
     })
+  // eslint-disable-next-line
   }, [])
 
 
@@ -124,6 +121,7 @@ function Main(props) {
           setRedrawTexts={setRedrawTexts} 
           undoing={undoLastPath}
           setData={setData}
+          setShowingBook={setShowingBook}
         />
       </div>
       
@@ -140,6 +138,7 @@ function Main(props) {
           setRedrawTexts={setRedrawTexts} 
           setCurText={setCurText}
           corner={corner}
+          mode={mode}
         /> 
       )}
 

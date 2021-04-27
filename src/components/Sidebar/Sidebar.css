@@ -3,7 +3,7 @@
   border: 0.5px solid #2f2235;
   transition: 0.5s;
   width: 10vh;
-  margin: 3vh;
+  margin: 1vh;
   height: 10vh;
   outline: none;
   border-radius: 10px;
@@ -27,4 +27,12 @@
 
 .sidebar-container {
   width: 20vh;
+}
+
+.btn-selected {
+  border: 5px solid #3f3244!important;
+}
+
+.flip-content {
+  transform: scaleX(-1);
 }

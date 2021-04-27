@@ -92,7 +92,47 @@ function savePage(index, data) {
   localStorage.setItem('page'+index, JSON.stringify(data))
 }
 
+function pathIntersects(x, y, path, size) {
+  let doWeIntersect = false
+  let prevDot = null
 
+  path.forEach((item, i) => {
+    if (prevDot !== null) {
+      const {k, a} = getAAndKOfLine(prevDot.x, prevDot.y, item.x, item.y)
+      const aPrime = y - x * k
+      const diff = Math.abs(a - aPrime)
+      if (diff < 4/size) {
+        doWeIntersect = true
+      }
+    }
 
+    if (((item.x - x)**2 + (item.y - y)**2) < (4/size)**2) {
+      doWeIntersect = true
+    }
 
-export { redrawCanvas, drawPath, openPage, savePage }
+    prevDot = item
+  })
+
+  return doWeIntersect
+}
+
+function getAAndKOfLine(x1, y1, x2, y2) {
+  let k = (y2 - y1) / (x2 - x1)
+  let a = y1 - x1 * k
+  return {k, a}
+}
+
+function findNewIdx(array) {
+  let idx = 0
+  let found = false
+  while (!found) {
+    found = true
+    array.forEach(e => {
+      if (e.index === idx) found = false
+    })
+    idx++
+  }
+  return idx
+}
+
+export { redrawCanvas, drawPath, openPage, savePage, pathIntersects, findNewIdx }

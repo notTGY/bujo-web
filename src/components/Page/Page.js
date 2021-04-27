@@ -2,7 +2,7 @@ import React, { useCallback, useState, useEffect } from 'react'
 
 import './Page.css'
 
-import { redrawCanvas, drawPath } from '../../utils/utils'
+import { redrawCanvas, drawPath, pathIntersects } from '../../utils/utils'
 
 
 function Page(props) {
@@ -96,7 +96,19 @@ function Page(props) {
         const ctx = canvas.getContext('2d')
         drawPath(canvas, ctx, [{type: 'pen', pageIndex: props.pageIndex}, {x: relX, y: relY}], props.pageIndex)
       }
-    } else if (props.mode === 'line') {
+    } else if (props.mode === 'eraser') {
+        const relX = (e.clientX - canvas.offsetLeft) / cellDPI
+        const relY = (e.clientY - canvas.offsetTop) / cellDPI
+
+        let res = JSON.parse(JSON.stringify(data))
+        res.paths = []
+        data.paths.forEach((item, i) => {
+          if (!pathIntersects(relX, relY, item, cellDPI)) res.paths.push(item)
+        })
+        setData(res)
+        const ctx = canvas.getContext('2d')
+        redrawCanvas(canvas, ctx, res, pageIndex)
+        updateStorage(res)
     }
   }
 
