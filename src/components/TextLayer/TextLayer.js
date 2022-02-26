@@ -67,5 +67,4 @@ function TextLayer(props) {
         />
 }
 
-
 export default TextLayer

@@ -2,6 +2,7 @@
   "name": "bujo-web",
   "version": "0.1.0",
   "private": true,
+  "homepage": "./",
   "dependencies": {
     "@craco/craco": "^6.1.0",
     "@tailwindcss/postcss7-compat": "^2.0.2",

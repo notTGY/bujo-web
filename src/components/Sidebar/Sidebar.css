@@ -16,6 +16,8 @@
 }
 
 .sidebar-button:focus {
+  background: #cca39d;
+  border: 0.5px solid #3f3244;
   outline: none;
 }
 

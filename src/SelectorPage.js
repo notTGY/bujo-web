@@ -32,25 +32,22 @@ function SelectorPage(props) {
           className="flex flex-col justify-start h-full pt-0.5 px-1 overflow-auto border border-paper-shaded rounded-sm mt-0.5 fancy-scrollbar"
         >
           {pages.map((item, i) => 
-            <div 
+            <button 
               key={i} 
               className="cursor-pointer rounded bg-paper-shaded p-1 mb-0.5 hover:text-ink-highlighted transition flex justify-between items-center"
+              onClick={e=>{
+                if (i === pages.length - 1) {
+                  let obj = pages
+                  obj.pop()
+                  obj.push({title: 'new page', index: findNewIdx(obj)})
+                  localStorage.setItem('index', JSON.stringify(obj))
+                }
+                setPageIndex(item.index)
+                setShowingBook(true)
+              }}
             >
               <div className="flex items-center">
-                <span
-                  onClick={e=>{
-                    if (i === pages.length - 1) {
-                      let obj = pages
-                      obj.pop()
-                      obj.push({title: 'new page', index: findNewIdx(obj)})
-                      localStorage.setItem('index', JSON.stringify(obj))
-                    }
-                    setPageIndex(item.index)
-                    setShowingBook(true)
-                  }}
-                >
-                -
-                </span>
+                <span> - </span>
                 <input 
                   value={item.title} 
                   name={i}
@@ -67,12 +64,16 @@ function SelectorPage(props) {
                     localStorage.setItem('index', JSON.stringify(cpy))
                   }}
                   readOnly={i===pages.length-1}
+                  onClick={e=>{
+                    e.stopPropagation()
+                  }}
                 />
               </div>
 
               {i !== pages.length-1 ? 
               <span
                 onClick={e=>{
+                  e.stopPropagation()
                   if (i === pages.length - 1) return
                   let obj = pages
                   obj.splice(i, 1)
@@ -88,7 +89,7 @@ function SelectorPage(props) {
                 </svg>
               </span>:
               ''}
-            </div>)}
+            </button>)}
         </div>
       </div>
     </div>
